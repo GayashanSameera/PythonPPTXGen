@@ -1,6 +1,6 @@
 from pptx import Presentation
 
-def replace_text(replacements, shapes):
+def replace_tags(replacements, shapes):
     for shape in shapes:
         for match, replacement in replacements.items():
             if shape.has_text_frame:
@@ -32,5 +32,5 @@ if __name__ == '__main__':
             '{{var2}}': 'text 2',
             '{{var3}}': 'text 3'
             }
-    replace_text(replaces, shapes)
+    replace_tags(replaces, shapes)
     prs.save('output.pptx')
