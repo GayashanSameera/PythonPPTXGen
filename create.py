@@ -1,7 +1,9 @@
 from pptx import Presentation
 from pptx.util import Inches
-# from pptx.util import Px
-# from PIL import Image
+from pptx.util import Pt
+from pptx.dml.color import RGBColor
+from pptx.oxml.xmlchemy import OxmlElement
+import math
 
 img_path = 'sample.png'
 
@@ -37,9 +39,97 @@ def replace_images(replacements, slide, index):
             print(data)
             slide.shapes.add_picture(data["path"], data["size"]["left"], data["size"]["top"], data["size"]["width"] ,data["size"]["height"] )
 
+def SubElement(parent, tagname, **kwargs):
+        element = OxmlElement(tagname)
+        element.attrib.update(kwargs)
+        parent.append(element)
+        return element
+
+def _set_cell_border(cell, border_color="000000", border_width='12700'):
+    tc = cell._tc
+    tcPr = tc.get_or_add_tcPr()
+    for lines in ['a:lnL','a:lnR','a:lnT','a:lnB']:
+        ln = SubElement(tcPr, lines, w=border_width, cap='flat', cmpd='sng', algn='ctr')
+        solidFill = SubElement(ln, 'a:solidFill')
+        srgbClr = SubElement(solidFill, 'a:srgbClr', val=border_color)
+        prstDash = SubElement(ln, 'a:prstDash', val='solid')
+        round_ = SubElement(ln, 'a:round')
+        headEnd = SubElement(ln, 'a:headEnd', type='none', w='med', len='med')
+        tailEnd = SubElement(ln, 'a:tailEnd', type='none', w='med', len='med')
+
+
+def tables_headers(table, headers):
+    i = 0
+    for header in headers:
+        table.cell(0, i).text = header
+        cell = table.cell(0, i)
+        cell.fill.solid()
+        cell.fill.fore_color.rgb = RGBColor(200, 253, 251)
+        _set_cell_border(cell,"949595", '12000')
+        para = cell.text_frame.paragraphs[0]
+        para.font.bold = True
+        para.font.size = Pt(5)
+        para.font.name = 'Comic Sans MS'
+        para.font.color.rgb = RGBColor(19, 170, 246)
+        table.columns[i].width = Inches(0.6)
+        i += 1
+
+def tables_rows(table, rowData, start, end,totalRows):
+    j = start
+    cell_start = 1
+
+    entCount = end
+    if end > totalRows:
+        entCount = totalRows
+
+    while j < entCount + 1:
+        element = rowData[j - 1]
+        print("element",element)
+        k = 0
+        if element:
+            for key, value in element.items():
+                table.cell(cell_start, k).text = value
+                cell = table.cell(cell_start, k)
+                cell.fill.solid()
+                cell.fill.fore_color.rgb = RGBColor(228, 228, 228)
+                _set_cell_border(cell,"949595", '12000')
+                para = cell.text_frame.paragraphs[0]
+                para.font.size = Pt(6)
+                para.font.name = 'Comic Sans MS'
+                k += 1
+        j += 1
+        cell_start += 1
+
+def replace_tables(replacements, slide):
+    top, width, height  = Inches(0.6), Inches(2), Inches(0.04)
+    rows = replacements["rowCount"]
+    cols = replacements["columCount"]
+    headers = replacements["headers"]
+    rowData = replacements["rows"]
+
+    totalRows = len(rowData)
+    tableCount = math.ceil(totalRows / rows) 
+    print("totalRows",totalRows)
+    print("tableCount",tableCount)
+
+    j = 0
+    left = 1
+    while j < tableCount:
+        shape = slide.shapes.add_table(rows + 1, cols, Inches(left) , top, width, height)
+        table = shape.table
+        tables_headers(table, headers)
+        print("start",(rows * j )+ 1)
+        print("end",rows * (j + 1))
+        tables_rows(table,rowData, (rows * j )+ 1, rows * (j + 1) ,totalRows )
+        left += 2
+        j += 1
+
+    
+
+
 if __name__ == '__main__':
 
-    prs = Presentation('indput1.pptx')
+    prs = Presentation('input.pptx')
     dataBump = {
         "image_replaces": {
                         "1": [{"path": "1.png", "size":{"left":Inches(2),"top":Inches(2), "height":Inches(3), "width":Inches(8) }}]
@@ -60,7 +150,328 @@ if __name__ == '__main__':
             '{{var14}}':'If you do not know this information then you can simply leave these boxes blank, and we will treat the LDI assets as cash.'
             },
         "table_replaces": {
-
+            "cashFlows":{
+                "columCount": 3,
+                "rowCount": 30,
+                "headers": ["cashflow year","cashflow fixed","cashflow real"],
+                "rows": [ 
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"1","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"2","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"3","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"4","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"5","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"6","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"7","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"8","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"9","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"10","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"11","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"12","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"13","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"14","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"15","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"16","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"17","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"18","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"19","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"20","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"21","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"22","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"23","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"24","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"25","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"26","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"27","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"28","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"29","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"30","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"31","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"32","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"33","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"34","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"35","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"36","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"37","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"38","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"39","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"40","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"41","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"42","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"43","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"44","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"45","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"51","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"52","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"53","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"54","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"55","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"56","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"57","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"58","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"59","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"510","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"151","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"512","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"153","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"154","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"155","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"61","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"62","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"63","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"64","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"65","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"66","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"67","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"68","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"69","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"170","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"171","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"172","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"173","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"174","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"175","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"17","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"82","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"83","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"84","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"85","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"86","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"87","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"88","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"89","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"190","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"191","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"192","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"193","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"194","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"195","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"17","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"82","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"83","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"84","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"85","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"86","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"87","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"88","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"89","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"190","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"191","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"192","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"193","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"194","cashflow_real": "123123"
+                    },
+                    {
+                        "cashflow_year": "2020","cashflow_fixed":"195","cashflow_real": "123123"
+                    }
+                 ]
+            }
         } 
              
     }
@@ -76,6 +487,9 @@ if __name__ == '__main__':
         if "text_replaces" in dataBump:
             for shape in slide.shapes:
                 shapes.append(shape)
+
+        if(slides.index(slide) == 4):
+            replace_tables(dataBump["table_replaces"]["cashFlows"], slide)
 
     if "text_replaces" in dataBump:
         replace_txt(dataBump["text_replaces"], shapes)
