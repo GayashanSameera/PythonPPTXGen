@@ -7,10 +7,9 @@ import math
 import re
 import pydash
 
-from helpers.utils import check_tag_exist, remove_tags, get_tag_content
+from helpers.utils import check_tag_exist, replace_tags, get_tag_content
 
 def replace_tables(presentation, slide, shape, slide_index, replacements):
-
     pattern = r'\+\+\+TABLE_ADD (.*?) \+\+\+'
     matches = get_tag_content(pattern, shape)
 
@@ -20,6 +19,7 @@ def replace_tables(presentation, slide, shape, slide_index, replacements):
     for match in matches:
         object_value = pydash.get(replacements, match)
         if(object_value):
+            replace_tags(str(f"+++TABLE_ADD {match} +++"), "", shape)
             create_table(presentation, slide, shape, slide_index, object_value)
 
 def create_table(presentation, slide, shape, slide_index, replacements):
@@ -58,15 +58,17 @@ def create_table(presentation, slide, shape, slide_index, replacements):
         if(s > 0 and current_slide != s):
             for new_slide_shape in presentation.slides[slide_index + s].shapes:
                 if new_slide_shape.has_text_frame:
-                    matches = check_tag_exist('EXTRA_SLIDE', new_slide_shape)
+                    extra = 'EXTRA_SLIDE'
+                    matches = check_tag_exist(extra, new_slide_shape)
                     if(matches):
                         extra_slide_exists = True
+                        replace_tags(str(f"+++ {extra} +++"), "", new_slide_shape)
                         break
             current_slide = s
 
         if(s > 0 and (not extra_slide_exists)):
             return 
-
+            
 
         while j < table_count:
             shape = presentation.slides[slide_index + s].shapes.add_table(row_count + 1, cols, Inches(left) , Inches(styles["top"]), Inches(styles["width"]), Inches(styles["row_height"]))

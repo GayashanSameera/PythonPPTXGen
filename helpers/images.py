@@ -7,7 +7,7 @@ import math
 import re
 import pydash
 
-from helpers.utils import check_tag_exist, remove_tags, get_tag_content
+from helpers.utils import check_tag_exist, replace_tags, get_tag_content
 
 def replace_images(slide, shape, replacements):
     pattern = r'\+\+\+CHART (.*?) \+\+\+'
@@ -15,8 +15,6 @@ def replace_images(slide, shape, replacements):
 
     if( not matches or len(matches) < 1):
         return
-
-    text_frame = shape.text_frame
 
     for match in matches:
         object_value = pydash.get(replacements, match)
@@ -28,9 +26,5 @@ def replace_images(slide, shape, replacements):
         width = pydash.get(object_value, "size.width")
         
         slide.shapes.add_picture(url, Inches(left), Inches(top), Inches(width) ,Inches(height) )
-
-        for paragraph in text_frame.paragraphs:
-            for run in paragraph.runs:
-                cur_text = run.text
-                new_text = cur_text.replace(str(f"+++CHART {match} +++"), "")
-                run.text = new_text
+        replace_tags(str(f"+++CHART {match} +++"), "", shape)
+        

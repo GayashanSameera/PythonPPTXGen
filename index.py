@@ -7,7 +7,7 @@ import math
 import re
 import pydash
 
-from helpers.utils import check_tag_exist, remove_tags, get_tag_content
+from helpers.utils import check_tag_exist, replace_tags, get_tag_content
 from helpers.texts import text_replace
 from helpers.images import replace_images
 from helpers.tables import replace_tables
@@ -25,7 +25,7 @@ if __name__ == '__main__':
         "chart_1": { "url" : "1.png" , "size": {"left":1,"top":1, "height":3, "width":8}},
         "cashFlows":{
                 "headers": ["cashflow year","cashflow fixed","cashflow real"],
-                "row_count": 15,
+                "row_count": 10,
                 "colum_count": 3,
                 "table_count_per_slide": 4,
                 "styles": {
