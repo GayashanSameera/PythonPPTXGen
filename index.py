@@ -4,227 +4,35 @@ from pptx.util import Pt
 from pptx.dml.color import RGBColor
 from pptx.oxml.xmlchemy import OxmlElement
 import math
+import re
+import pydash
 
-img_path = 'sample.png'
-
-def replace_txt(replacements, shapes):
-    for shape in shapes:
-        for match, replacement in replacements.items():
-            #find tags inside text frame
-            if shape.has_text_frame:
-                if (shape.text.find(match)) != -1:
-                    text_frame = shape.text_frame
-                    
-                    for paragraph in text_frame.paragraphs:
-                        for run in paragraph.runs:
-                            cur_text = run.text
-                            new_text = cur_text.replace(str(match), str(replacement))
-                            run.text = new_text
-            #find tags inside table frame
-            if shape.has_table:
-                for row in shape.table.rows:
-                    for cell in row.cells:
-                        if match in cell.text:
-                            new_text = cell.text.replace(match, replacement)
-                            cell.text = new_text
-
-# def _get_blank_slide_layout(pres):
-#          layout_items_count = [len(layout.placeholders) for layout in pres.slide_layouts]
-#          min_items = min(layout_items_count)
-#          blank_layout_id = layout_items_count.index(min_items)
-#          return pres.slide_layouts[blank_layout_id]
-
-# def copy_slide(pres,pres1,index):
-#         source = pres.slides[index]
-
-#         blank_slide_layout = _get_blank_slide_layout(pres)
-#         dest = pres1.slides.add_slide(blank_slide_layout)
-
-#         for shp in source.shapes:
-#             el = shp.element
-#             newel = copy.deepcopy(el)
-#             dest.shapes._spTree.insert_element_before(newel, 'p:extLst')
-
-#             for key, value in six.iteritems(source.rels):
-#                         # Make sure we don't copy a notesSlide relation as that won't exist
-#                     if not "notesSlide" in value.reltype:
-#                             dest.rels.add_relationship(value.reltype, value._target, value.rId)
-
-#             return dest
-
-
-
-def replace_images(replacements, slide, index):
-    if str(index) in replacements:
-        objectKey = str(index)
-        replacedData = replacements[objectKey]
-        print(replacedData)
-
-        for data in replacedData:
-            print(data)
-            slide.shapes.add_picture(data["path"], data["size"]["left"], data["size"]["top"], data["size"]["width"] ,data["size"]["height"] )
-
-def SubElement(parent, tagname, **kwargs):
-        element = OxmlElement(tagname)
-        element.attrib.update(kwargs)
-        parent.append(element)
-        return element
-
-def _set_cell_border(cell, border_color="000000", border_width='12700'):
-    tc = cell._tc
-    tcPr = tc.get_or_add_tcPr()
-    for lines in ['a:lnL','a:lnR','a:lnT','a:lnB']:
-        ln = SubElement(tcPr, lines, w=border_width, cap='flat', cmpd='sng', algn='ctr')
-        solidFill = SubElement(ln, 'a:solidFill')
-        srgbClr = SubElement(solidFill, 'a:srgbClr', val=border_color)
-        prstDash = SubElement(ln, 'a:prstDash', val='solid')
-        round_ = SubElement(ln, 'a:round')
-        headEnd = SubElement(ln, 'a:headEnd', type='none', w='med', len='med')
-        tailEnd = SubElement(ln, 'a:tailEnd', type='none', w='med', len='med')
-
-
-def tables_headers(table, headers):
-    i = 0
-    for header in headers:
-        table.cell(0, i).text = header
-        cell = table.cell(0, i)
-        cell.fill.solid()
-        cell.fill.fore_color.rgb = RGBColor(200, 253, 251)
-        _set_cell_border(cell,"949595", '12000')
-        para = cell.text_frame.paragraphs[0]
-        para.font.bold = True
-        para.font.size = Pt(5)
-        para.font.name = 'Comic Sans MS'
-        para.font.color.rgb = RGBColor(19, 170, 246)
-        table.columns[i].width = Inches(0.6)
-        i += 1
-
-def tables_rows(table, rowData, start, end,totalRows):
-    j = start
-    cell_start = 1
-
-    entCount = end
-    if end > totalRows:
-        entCount = totalRows
-
-    while j < entCount + 1:
-        element = rowData[j - 1]
-        k = 0
-        if element:
-            for key, value in element.items():
-                table.cell(cell_start, k).text = value
-                cell = table.cell(cell_start, k)
-                cell.fill.solid()
-                cell.fill.fore_color.rgb = RGBColor(228, 228, 228)
-                _set_cell_border(cell,"949595", '12000')
-                para = cell.text_frame.paragraphs[0]
-                para.font.size = Pt(6)
-                para.font.name = 'Comic Sans MS'
-                k += 1
-        j += 1
-        cell_start += 1
-
-
-# def add_extra_data_to_next_slide():
-
-#  remove unwanted templates 
-def delete_slides(presentation, index):
-    xml_slides = presentation.slides._sldIdLst  
-    slides = list(xml_slides)
-    print(index)
-    try:
-        slides[index]
-        xml_slides.remove(slides[index])
-    except ValueError:
-        print("error") 
-        
-
-def replace_tables(replacements, slide , presentation, slideIndex):
-    top, width, height  = Inches(0.6), Inches(2), Inches(0.04)
-    rows = replacements["rowCount"]
-    cols = replacements["columCount"]
-    headers = replacements["headers"]
-    rowData = replacements["rows"]
-    extraSlideIndex = replacements["extraSlideIndex"]
-    totalRows = len(rowData)
-    totaltableCount = math.ceil(totalRows / rows)
-
-    slideCount = math.ceil(totaltableCount / 4) 
-
-    extraSlideCount = slideCount - 1
-
-    if(extraSlideCount > 0):
-        i = 0
-        while i < extraSlideCount:
-            extraSlideIndex.pop(0)
-            i += 1
-
-    loop = 0
-    for preInedx in extraSlideIndex:
-        deleteIndex = preInedx
-        if(loop > 0):
-            deleteIndex -= 1
-        delete_slides(presentation, deleteIndex)
-        loop += 1
-
-    s = 0
-    end = 0
-
-    while s < slideCount:
-        j = 0
-        left = 1
-        if totaltableCount > 4 :
-            tableCount = 4
-        else:
-            tableCount = totaltableCount
-
-        slideRowStart = 0
-        slideRowEnd = 0
-        while j < tableCount:
-            shape = presentation.slides[slideIndex + s].shapes.add_table(rows + 1, cols, Inches(left) , top, width, height)
-            table = shape.table
-            tables_headers(table, headers)
-
-            slideRowStart = (rows * j ) + 1 + end
-            slideRowEnd = slideRowStart + (rows - 1)
-
-            tables_rows(table,rowData, slideRowStart, slideRowEnd ,totalRows )
-            left += 2
-            j += 1
-
-        end = slideRowEnd
-        totaltableCount -= 4
-        s += 1
+from helpers.utils import check_tag_exist, remove_tags, get_tag_content
+from helpers.texts import text_replace
+from helpers.images import replace_images
+from helpers.tables import replace_tables
 
 
 if __name__ == '__main__':
 
-    prs = Presentation('input.pptx')
-    dataBump = {
-        "image_replaces": {
-                        "1": [{"path": "1.png", "size":{"left":Inches(2),"top":Inches(2), "height":Inches(3), "width":Inches(8) }}]
-                    },
-        "text_replaces":  {
-            '{{var1}}': 'LGIM Bridge',
-            '{{var2}}': 'External asset workflow',
-            '{{var3}}': 'Active Client page – External assets',
-            '{{var4}}': 'LGIM/Client user',
-            '{{var5}}': 'Active Client page – External assets',
-            '{{var6}}': 'LGIM/Client user – when the user clicks on ‘Edit detail’ for a date',
-            '{{var7}}': 'Active Client page – External assets',
-            '{{var8}}': 'Information button text',
-            '{{var10}}': "If the scheme holds assets which are not managed by LGIM, details can be entered here. This information will be used for tracking the funding level, and also for overall portfolio risk analysis and funding level projections.Enter the value of non-LGIM assets held at different dates. We will roll the asset value forward in an approximate manner between dates provided.By default any asset values provided will be treated as cash for both funding level tracking and risk analysis purposes. However, if you click on ‘Edit details’ for a given asset value then you will be able to provide a breakdown of the value by fund and asset class. If this information is provided then we will roll forward the asset value in line with index returns for the relevant asset class, and will include the external assets within overall portfolio risk analysis. Once you have entered the breakdown of the asset value at one date, this breakdown will be carried forward to subsequent dates by default, unless you choose to edit the detail within these later dates (for example, following a significant change in the portfolio). This enables you to quickly update the value of non-LGIM assets without having to re-enter the underlying detail at every date.",
-            '{{var11}}': 'PV01 and IE01 data should be available from your LDI provider. Note that positive numbers should typically be entered.',
-            '{{var12}}': 'PV01 - Please enter the increase in asset value that would expected in £ terms if interest rates fell 0.01%.',
-            '{{var13}}':'IE01 - Please enter the increase in asset value that would expected in £ terms if price inflation expectations increased 0.01%.',
-            '{{var14}}':'If you do not know this information then you can simply leave these boxes blank, and we will treat the LDI assets as cash.'
-            },
-        "table_replaces": {
-            "cashFlows":{
-                "columCount": 3,
-                "rowCount": 30,
+    prs = Presentation('input_2.pptx')
+
+    replacements = {
+        "scheme_name": "gayashan",
+        "chart_name": "gayashan chart",
+        'table_name': "gayashan table",
+        "sample_name": "gayashan sample",
+        "chart_1": { "url" : "1.png" , "size": {"left":1,"top":1, "height":3, "width":8}},
+        "cashFlows":{
                 "headers": ["cashflow year","cashflow fixed","cashflow real"],
-                "extraSlideIndex": [ 6,7,8 ],
+                "row_count": 15,
+                "colum_count": 3,
+                "table_count_per_slide": 4,
+                "styles": {
+                    "top": 1,
+                    "width": 0.6,
+                    "row_height": 0.04,
+                },
                 "rows": [ 
                     {
                         "cashflow_year": "2020","cashflow_fixed":"1","cashflow_real": "123123"
@@ -858,25 +666,27 @@ if __name__ == '__main__':
                     }
                  ]
             }
-        } 
-             
+
     }
 
     slides = [slide for slide in prs.slides]
-    shapes = []
     for slide in slides:
-        print(slide)
-        if "image_replaces" in dataBump:
-            replace_images(dataBump["image_replaces"], slide, slides.index(slide))
+        for shape in slide.shapes:
+            if shape.has_text_frame:
+                if("+++IF" in shape.text):
+                    print("======IF======>")
 
-        if "text_replaces" in dataBump:
-            for shape in slide.shapes:
-                shapes.append(shape)
+                if("+++FOR" in shape.text):
+                    print("======FOR======>")
 
-        if(slides.index(slide) == 5):
-            replace_tables(dataBump["table_replaces"]["cashFlows"], slide, prs,slides.index(slide))
+                if("+++CHART" in shape.text):
+                    replace_images(slide, shape, replacements)
+                    
+                if("+++INS" in shape.text):
+                    text_replace(slide, shape, replacements)
 
-    if "text_replaces" in dataBump:
-        replace_txt(dataBump["text_replaces"], shapes)
+                if("+++TABLE_ADD" in shape.text):
+                    replace_tables(prs, slide, shape,slides.index(slide), replacements)
+                    
 
     prs.save('output.pptx')
