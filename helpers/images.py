@@ -7,7 +7,7 @@ import math
 import re
 import pydash
 
-from helpers.utils import check_tag_exist, replace_tags, get_tag_content
+from helpers.utils import replace_tags, get_tag_content
 
 def replace_images(slide, shape, replacements):
     pattern = r'\+\+\+CHART (.*?) \+\+\+'

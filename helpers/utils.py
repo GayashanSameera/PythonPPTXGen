@@ -14,15 +14,10 @@ def check_tag_exist(tag, shape):
 def replace_tags(replaced_for,replaced_text, shape):
     if shape.has_text_frame:
         text_frame = shape.text_frame
-        print(shape)
-        print(text_frame)
-        print(replaced_for)
         for paragraph in text_frame.paragraphs:
-            print(paragraph)
             for run in paragraph.runs:
                 cur_text = run.text
                 new_text = cur_text.replace(replaced_for, replaced_text)
-                print("new_text",new_text)
                 run.text = new_text
 
     if shape.has_table:
@@ -34,6 +29,10 @@ def replace_tags(replaced_for,replaced_text, shape):
 
 def get_tag_content(pattern,shape):
     matches = re.findall(pattern, shape.text)
+    return matches
+
+def get_tag_from_string(pattern,string):
+    matches = re.findall(pattern, string)
     return matches
 
 def eval_executor():

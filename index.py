@@ -12,6 +12,7 @@ from helpers.texts import text_replace
 from helpers.images import replace_images
 from helpers.tables import replace_tables
 
+from expretions.for_loop import looper
 
 if __name__ == '__main__':
 
@@ -23,6 +24,9 @@ if __name__ == '__main__':
         'table_name': "gayashan table",
         "sample_name": "gayashan sample",
         "chart_1": { "url" : "1.png" , "size": {"left":1,"top":1, "height":3, "width":8}},
+        "SAMPLE_DATA_1": [{"NAME": "GAYA 1", "AGE": 12},{"NAME": "GAYA 2", "AGE": 22},{"NAME": "GAYA 13", "AGE": 32}],
+        "SAMPLE_DATA_2": [{"NAME": "GAYA 1", "AGE": 12},{"NAME": "GAYA 2", "AGE": 22},{"NAME": "GAYA 13", "AGE": 32}],
+        "SAMPLE_DATA_3": [{"NAME": "GAYA 1", "AGE": 12},{"NAME": "GAYA 2", "AGE": 22},{"NAME": "GAYA 13", "AGE": 32}],
         "cashFlows":{
                 "headers": ["cashflow year","cashflow fixed","cashflow real"],
                 "row_count": 10,
@@ -676,16 +680,16 @@ if __name__ == '__main__':
                 if("+++IF" in shape.text):
                     print("======IF======>")
 
-                if("+++FOR" in shape.text):
-                    print("======FOR======>")
+                elif("+++FOR" in shape.text):
+                    looper(prs, slide, shape,slides.index(slide), replacements)
 
-                if("+++CHART" in shape.text):
+                elif("+++CHART" in shape.text):
                     replace_images(slide, shape, replacements)
                     
-                if("+++INS" in shape.text):
+                elif("+++INS" in shape.text):
                     text_replace(slide, shape, replacements)
 
-                if("+++TABLE_ADD" in shape.text):
+                elif("+++TABLE_ADD" in shape.text):
                     replace_tables(prs, slide, shape,slides.index(slide), replacements)
                     
 
