@@ -13,6 +13,7 @@ from helpers.images import replace_images
 from helpers.tables import replace_tables
 
 from expretions.for_loop import looper
+from expretions.if_condition import _if
 
 if __name__ == '__main__':
 
@@ -23,6 +24,7 @@ if __name__ == '__main__':
         "chart_name": "gayashan chart",
         'table_name': "gayashan table",
         "sample_name": "gayashan sample",
+        "TABLE_1_PRESENT": True,
         "chart_1": { "url" : "1.png" , "size": {"left":1,"top":1, "height":3, "width":8}},
         "SAMPLE_DATA_1": [{"NAME": "GAYA 1", "AGE": 12},{"NAME": "GAYA 2", "AGE": 22},{"NAME": "GAYA 13", "AGE": 32}],
         "SAMPLE_DATA_2": [{"NAME": "GAYA 1", "AGE": 12},{"NAME": "GAYA 2", "AGE": 22},{"NAME": "GAYA 13", "AGE": 32}],
@@ -679,6 +681,7 @@ if __name__ == '__main__':
             if shape.has_text_frame:
                 if("+++IF" in shape.text):
                     print("======IF======>")
+                    _if(prs, slide, shape,slides.index(slide), replacements)
 
                 elif("+++FOR" in shape.text):
                     looper(prs, slide, shape,slides.index(slide), replacements)

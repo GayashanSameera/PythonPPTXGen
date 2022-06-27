@@ -35,5 +35,5 @@ def get_tag_from_string(pattern,string):
     matches = re.findall(pattern, string)
     return matches
 
-def eval_executor():
-    eval('CHART_NAME + TABLE_NAME',replacements)
+def eval_executor(logic, replacements):
+    return eval(logic,replacements)
