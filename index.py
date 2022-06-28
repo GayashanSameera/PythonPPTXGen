@@ -12,8 +12,8 @@ from helpers.texts import text_replace
 from helpers.images import replace_images
 from helpers.tables import replace_tables
 
-from expretions.for_loop import looper
-from expretions.if_condition import _if
+from expressions.for_loop import looper
+from expressions.if_condition import _if
 
 if __name__ == '__main__':
     start_time = time.perf_counter ()
