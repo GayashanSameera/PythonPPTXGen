@@ -68,7 +68,6 @@ def remove_extra_slides(presentation):
         for shape in slide.shapes:
             if shape.has_text_frame:
                 matches = check_tag_exist(extra, shape)
-                print(matches)
                 if(matches):
                     slide_indexs_to_delete.append(slides.index(slide))
 

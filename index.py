@@ -6,7 +6,7 @@ from pptx.oxml.xmlchemy import OxmlElement
 import math
 import re
 import pydash
-
+import time
 from helpers.utils import check_tag_exist, replace_tags, get_tag_content, remove_extra_slides
 from helpers.texts import text_replace
 from helpers.images import replace_images
@@ -16,21 +16,26 @@ from expretions.for_loop import looper
 from expretions.if_condition import _if
 
 if __name__ == '__main__':
-
+    start_time = time.perf_counter ()
     prs = Presentation('input_2.pptx')
 
     replacements = {
-        "scheme_name": "gayashan",
-        "chart_name": "gayashan chart",
-        'table_name': "gayashan table",
-        "sample_name": "gayashan sample",
-        "TABLE_1_PRESENT": True,
-        "TABLE_1_ROW_3_PRESENT": False,
-        "TABLE_1_COLUMN_4_PRESENT": False,
-        "chart_1": { "url" : "1.png" , "size": {"left":1,"top":1, "height":3, "width":8}},
-        "SAMPLE_DATA_1": [{"NAME": "GAYA 1", "AGE": 12},{"NAME": "GAYA 2", "AGE": 22},{"NAME": "GAYA 13", "AGE": 32}],
-        "SAMPLE_DATA_2": [{"NAME": "GAYA 1", "AGE": 12},{"NAME": "GAYA 2", "AGE": 22},{"NAME": "GAYA 13", "AGE": 32}],
-        "SAMPLE_DATA_3": [{"NAME": "GAYA 1", "AGE": 12},{"NAME": "GAYA 2", "AGE": 22},{"NAME": "GAYA 13", "AGE": 32}],
+        "name": "Gayashan Sameera",
+        "position": "SSE",
+        "city": "Minuwangoda",
+        "excubed_image_title": "Workflow landing page",
+        "landing_image": { "url" : "1.png" , "size": {"left":1,"top":1, "height":3, "width":8}},
+        "project_description": "React , Node , AWS serverless",
+        'table_name': "Sample table to delete",
+        "remove_table_1": True,
+        'table_name_row': "Sample table to delete row",
+        "table_1_row_3_present": False,
+        'table_name_column': "Sample table to delete column",
+        "table_1_col_4_present": False,
+        "sample_name": "Loop sample data",
+        "sample_data_1": [{"name": "Kamal", "age": 12},{"name": "Amal", "age": 22},{"name": "Nuwan", "age": 32}],
+        "sample_data_2": [{"name": "Sama", "age": 12},{"name": "Amara", "age": 22},{"name": "Nayana", "age": 32}],
+        "sample_data_3": [{"city": "Colombo", "number": 1},{"city": "Colombo", "number": 2},{"city": "Colombo", "number": 3}],
         "cashFlows":{
                 "headers": ["cashflow year","cashflow fixed","cashflow real"],
                 "row_count": 10,
@@ -682,7 +687,6 @@ if __name__ == '__main__':
         for shape in slide.shapes:
             if shape.has_text_frame:
                 if("+++IF" in shape.text):
-                    print("======IF======>")
                     _if(prs, slide, shape,slides.index(slide), replacements)
 
                 elif("+++FOR" in shape.text):
@@ -700,3 +704,5 @@ if __name__ == '__main__':
                     
 
     prs.save('output.pptx')
+    end_time = time.perf_counter ()
+    print(end_time - start_time, "seconds")

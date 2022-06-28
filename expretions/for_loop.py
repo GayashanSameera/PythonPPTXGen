@@ -36,7 +36,6 @@ def looper(presentation, slide, shape,slides_index, replacements):
                     if(updated_data and updated_data["text"]):
                         text_result += updated_data["text"] + "\n"
 
-
         # this is not working if you use tabspaces, but you can use spaces
         replace_tags(str(f"+++FOR {match} FOR-END+++"), text_result, shape)
 
