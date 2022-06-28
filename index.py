@@ -7,7 +7,7 @@ import math
 import re
 import pydash
 
-from helpers.utils import check_tag_exist, replace_tags, get_tag_content
+from helpers.utils import check_tag_exist, replace_tags, get_tag_content, remove_extra_slides
 from helpers.texts import text_replace
 from helpers.images import replace_images
 from helpers.tables import replace_tables
@@ -25,6 +25,8 @@ if __name__ == '__main__':
         'table_name': "gayashan table",
         "sample_name": "gayashan sample",
         "TABLE_1_PRESENT": True,
+        "TABLE_1_ROW_3_PRESENT": False,
+        "TABLE_1_COLUMN_4_PRESENT": False,
         "chart_1": { "url" : "1.png" , "size": {"left":1,"top":1, "height":3, "width":8}},
         "SAMPLE_DATA_1": [{"NAME": "GAYA 1", "AGE": 12},{"NAME": "GAYA 2", "AGE": 22},{"NAME": "GAYA 13", "AGE": 32}],
         "SAMPLE_DATA_2": [{"NAME": "GAYA 1", "AGE": 12},{"NAME": "GAYA 2", "AGE": 22},{"NAME": "GAYA 13", "AGE": 32}],
@@ -694,6 +696,7 @@ if __name__ == '__main__':
 
                 elif("+++TABLE_ADD" in shape.text):
                     replace_tables(prs, slide, shape,slides.index(slide), replacements)
+    remove_extra_slides(prs)
                     
 
     prs.save('output.pptx')

@@ -6,8 +6,9 @@ from pptx.oxml.xmlchemy import OxmlElement
 import math
 import re
 import pydash
+from lxml import etree
 
-from helpers.utils import check_tag_exist, replace_tags, get_tag_content
+from helpers.utils import check_tag_exist, replace_tags, get_tag_content, get_tag_from_string, eval_executor, is_extra_slide
 
 def replace_tables(presentation, slide, shape, slide_index, replacements):
     pattern = r'\+\+\+TABLE_ADD (.*?) \+\+\+'
@@ -57,13 +58,9 @@ def create_table(presentation, slide, shape, slide_index, replacements):
 
         if(s > 0 and current_slide != s):
             for new_slide_shape in presentation.slides[slide_index + s].shapes:
-                if new_slide_shape.has_text_frame:
-                    extra = 'EXTRA_SLIDE'
-                    matches = check_tag_exist(extra, new_slide_shape)
-                    if(matches):
-                        extra_slide_exists = True
-                        replace_tags(str(f"+++ {extra} +++"), "", new_slide_shape)
-                        break
+                extra_slide_exists = is_extra_slide(presentation, slide_index + s, True)
+                if(extra_slide_exists):
+                    break
             current_slide = s
 
         if(s > 0 and (not extra_slide_exists)):
@@ -144,3 +141,66 @@ def _set_cell_border(cell, border_color="000000", border_width='12700'):
         round_ = SubElement(ln, 'a:round')
         headEnd = SubElement(ln, 'a:headEnd', type='none', w='med', len='med')
         tailEnd = SubElement(ln, 'a:tailEnd', type='none', w='med', len='med')
+
+def remove_row(table, row):
+    tbl = table._tbl
+    tr = row._tr
+    tbl.remove(tr)
+
+def remove_tables(slide,content):
+    #remove tables
+    table_remove_pattern = r'\+\+\+TABLE_REMOVE (.*?) \+\+\+'
+    table_remove_matches = get_tag_from_string(table_remove_pattern, content)
+    
+    if( table_remove_matches and len(table_remove_matches) > 0):
+        table_remove_index_matches = table_remove_matches[0]
+        _shap_count = 0
+        for _shape in slide.shapes:
+            if _shape.has_table: 
+                for row in _shape.table.rows:
+                    for cell in row.cells:
+                        if table_remove_index_matches in cell.text:
+                            old_picture = slide.shapes[_shap_count]
+                            old_pic = old_picture._element
+                            old_pic.getparent().remove(old_pic)
+                            break
+            _shap_count += 1
+
+def remove_table_rows(slide,content):
+    table_row_remove_pattern = r'\+\+\+TABLE_ROW_REMOVE (.*?) \+\+\+'
+    table_row_remove_matches = get_tag_from_string(table_row_remove_pattern, content)
+    if( table_row_remove_matches and len(table_row_remove_matches) > 0):
+        table_row_remove_index_matches = table_row_remove_matches[0]
+        for _shape in slide.shapes:
+            if _shape.has_table: 
+                for row_idx, row in enumerate(_shape.table.rows):
+                    for col_idx, cell in enumerate(row.cells):
+                        if table_row_remove_index_matches in cell.text:
+                            row_deleted = _shape.table.rows[row_idx]
+                            remove_row(_shape.table, row_deleted)
+                            break
+
+def remove_table_column(slide,content):
+    table_column_remove_pattern = r'\+\+\+TABLE_COLUMN_REMOVE (.*?) \+\+\+'
+    table_column_remove_matches = get_tag_from_string(table_column_remove_pattern, content)
+    if( table_column_remove_matches and len(table_column_remove_matches) > 0):
+        table_column_remove_index_matches = table_column_remove_matches[0]
+        for _shape in slide.shapes:
+            if _shape.has_table:
+                colum_index = ""
+                for row_idx, row in enumerate(_shape.table.rows):
+                    for col_idx, cell in enumerate(row.cells):
+                        if table_column_remove_index_matches in cell.text:
+                            colum_index = col_idx
+                            break
+
+                for row_idx, row in enumerate(_shape.table.rows):
+                    for col_idx, cell in enumerate(row.cells):
+                        if col_idx == colum_index:
+                            cell._tc.delete()
+
+                tree = etree.ElementTree(_shape.table._tbl)
+                for e in tree.iter():
+                    if(tree.getpath(e) == tree.getpath(_shape.table.columns[colum_index]._gridCol)):
+                        e.getparent().remove(e)
+                        break
