@@ -11,7 +11,7 @@ from lxml import etree
 from helpers.utils import check_tag_exist, replace_tags, get_tag_content, get_tag_from_string, eval_executor, is_extra_slide
 
 def replace_tables(presentation, slide, shape, slide_index, replacements):
-    pattern = r'\+\+\+TABLE_ADD (.*?) \+\+\+'
+    pattern = r'\+\+\+TB_ADD (.*?) \+\+\+'
     matches = get_tag_content(pattern, shape)
 
     if( not matches or len(matches) < 1):
@@ -20,7 +20,7 @@ def replace_tables(presentation, slide, shape, slide_index, replacements):
     for match in matches:
         object_value = pydash.get(replacements, match)
         if(object_value):
-            replace_tags(str(f"+++TABLE_ADD {match} +++"), "", shape)
+            replace_tags(str(f"+++TB_ADD {match} +++"), "", shape)
             create_table(presentation, slide, shape, slide_index, object_value)
 
 def create_table(presentation, slide, shape, slide_index, replacements):
