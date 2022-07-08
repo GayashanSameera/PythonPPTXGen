@@ -10,7 +10,7 @@ import pydash
 from helpers.utils import replace_tags, get_tag_content
 
 def replace_images(slide, shape, replacements):
-    pattern = r'\+\+\+CHART (.*?) \+\+\+'
+    pattern = r'\+\+\+IM (.*?) \+\+\+'
     matches = get_tag_content(pattern, shape)
 
     if( not matches or len(matches) < 1):
@@ -26,5 +26,5 @@ def replace_images(slide, shape, replacements):
         width = pydash.get(object_value, "size.width")
         
         slide.shapes.add_picture(url, Inches(left), Inches(top), Inches(width) ,Inches(height) )
-        replace_tags(str(f"+++CHART {match} +++"), "", shape)
+        replace_tags(str(f"+++IM {match} +++"), "", shape)
         

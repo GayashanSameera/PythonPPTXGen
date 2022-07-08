@@ -20,22 +20,40 @@ if __name__ == '__main__':
     prs = Presentation('input_2.pptx')
 
     replacements = {
-        "name": "Gayashan Sameera",
+        "name": "JHON DEO",
         "position": "SSE",
-        "city": "Minuwangoda",
-        "excubed_image_title": "Workflow landing page",
-        "landing_image": { "url" : "1.png" , "size": {"left":1,"top":1, "height":3, "width":8}},
+        "city": "NW",
+
+
+
+
+
+
+        "image_title": "This is a sample image",
+        "sample_image": { "url" : "Sample-image.png" , "size": {"left":1,"top":1, "height":3, "width":8}},
+
+
+        
         "project_description": "React , Node , AWS serverless",
+
+
+
         'table_name': "Sample table to delete",
         "remove_table_1": True,
         'table_name_row': "Sample table to delete row",
         "table_1_row_3_present": False,
         'table_name_column': "Sample table to delete column",
         "table_1_col_4_present": False,
+
+
         "sample_name": "Loop sample data",
         "sample_data_1": [{"name": "Kamal", "age": 12},{"name": "Amal", "age": 22},{"name": "Nuwan", "age": 32}],
         "sample_data_2": [{"name": "Sama", "age": 12},{"name": "Amara", "age": 22},{"name": "Nayana", "age": 32}],
         "sample_data_3": [{"city": "Colombo", "number": 1},{"city": "Colombo", "number": 2},{"city": "Colombo", "number": 3}],
+
+
+
+
         "cashFlows":{
                 "headers": ["cashflow year","cashflow fixed","cashflow real"],
                 "row_count": 10,
@@ -692,13 +710,13 @@ if __name__ == '__main__':
                 elif("+++FOR" in shape.text):
                     looper(prs, slide, shape,slides.index(slide), replacements)
 
-                elif("+++CHART" in shape.text):
+                elif("+++IM" in shape.text):
                     replace_images(slide, shape, replacements)
                     
                 elif("+++INS" in shape.text):
                     text_replace(slide, shape, replacements)
 
-                elif("+++TABLE_ADD" in shape.text):
+                elif("+++TB_ADD" in shape.text):
                     replace_tables(prs, slide, shape,slides.index(slide), replacements)
     remove_extra_slides(prs)
                     
