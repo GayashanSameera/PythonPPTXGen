@@ -10,50 +10,106 @@ import time
 from helpers.utils import check_tag_exist, replace_tags, get_tag_content, remove_extra_slides
 from helpers.texts import text_replace
 from helpers.images import replace_images
-from helpers.tables import replace_tables
+from helpers.tables import replace_tables, update_table_text, drow_tables
 
 from expressions.for_loop import looper
 from expressions.if_condition import _if
 
 if __name__ == '__main__':
     start_time = time.perf_counter ()
-    prs = Presentation('input_2.pptx')
+    prs = Presentation('input3.pptx')
 
     replacements = {
-        "name": "JHON DEO",
+        "schemeName": "XYZ Pension Scheme",
+        "title": "Q2 2021 Summary Report",
+        "heading":"Investment performance to 30 June 2021",
+        "assetAllocation": "Asset allocation at 30 June 2021",
+        "assetChart": { "url" : "img1.png" , "size": {"left":1,"top":1, "height":3, "width":4}},
+        "overallPerformance": "Overall performance",
+        "OPData":{
+            "styles" : {
+                "rw_1": {
+                    "font_size": 9,
+                    "font_name": "Arial",
+                    "alignment": "center",
+                },
+                "rw_2": {
+                    "font_size": 9,
+                    "font_name": "Arial",
+                    "alignment": "center",
+                },
+                "rw_3": {
+                    "font_size": 9,
+                    "font_name": "Arial",
+                    "font_color": (0, 118, 214),
+                    "alignment": "center",
+                }
+            },
+            "3monthsAsset": "5.6%",
+            "1yrAssets": "7.7%",
+            "assetsInception": "14.0%",
+            "3monthsliab": "3.1%",
+            "1yrliabs": "-6.7%",
+            "liabsInception": "-3.6%",
+            "3monthsOutPerformance": "2.4%",
+            "1yrpr": "14.4%",
+            "prInception": "17.6%",
+        },
+        "ACperformance":{
+            "styles" : {
+                "rw_1": {
+                    "font_color": (252, 250, 250),
+                    "bold": True,
+                    "background_color": (14, 99, 179)
+                },
+                "rw_2": {
+                    "bold": True,
+                    "background_color": (46, 197, 217)
+                },
+                "rw_8": {
+                    "bold": True,
+                    "background_color": (46, 197, 217)
+                },
+                "rw_10": {
+                    "font_color": (252, 250, 250),
+                    "bold": True,
+                    "background_color": (14, 99, 179)
+                },
+                "all": {
+                    "font_size": 9,
+                    "font_name": "Arial",
+                    "alignment": "center",
+                    "background_color": (252, 250, 250)
+                },
+            },
+            "rows": [
+                ["Scheme Performance", "5.6%" ,"7.7%"], 
+                ["Total Growth","4.0%","15.3%"],
+                ["Equities","5.4%","28.0%"],
+                ["Corporate Bonds","2.6%","-0.1%"],
+                ["Sovereign Bonds", "2.0%", "-1.4%"],
+                ["Alternatives","4.8%","12.3%"],
+                ["Dynamic Strategies","2.0%","13.9%"],
+                ["Total Matching","13.3%","-24.7%"],
+                ["LDI Funds & Cash","13.3%","-24.7%"],
+                ["Liability Benchmark","3.1%","-6.7%"],
+            ]
+        },
         "position": "SSE",
         "city": "NW",
-
-
-
-
-
-
         "image_title": "This is a sample image",
         "sample_image": { "url" : "Sample-image.png" , "size": {"left":1,"top":1, "height":3, "width":8}},
-
-
-        
         "project_description": "React , Node , AWS serverless",
-
-
-
         'table_name': "Sample table to delete",
         "remove_table_1": True,
         'table_name_row': "Sample table to delete row",
         "table_1_row_3_present": False,
         'table_name_column': "Sample table to delete column",
         "table_1_col_4_present": False,
-
-
         "sample_name": "Loop sample data",
         "sample_data_1": [{"name": "Kamal", "age": 12},{"name": "Amal", "age": 22},{"name": "Nuwan", "age": 32}],
         "sample_data_2": [{"name": "Sama", "age": 12},{"name": "Amara", "age": 22},{"name": "Nayana", "age": 32}],
         "sample_data_3": [{"city": "Colombo", "number": 1},{"city": "Colombo", "number": 2},{"city": "Colombo", "number": 3}],
-
-
-
-
         "cashFlows":{
                 "headers": ["cashflow year","cashflow fixed","cashflow real"],
                 "row_count": 10,
@@ -712,15 +768,24 @@ if __name__ == '__main__':
 
                 elif("+++IM" in shape.text):
                     replace_images(slide, shape, replacements)
-                    
-                elif("+++INS" in shape.text):
-                    text_replace(slide, shape, replacements)
 
                 elif("+++TB_ADD" in shape.text):
                     replace_tables(prs, slide, shape,slides.index(slide), replacements)
+
+                elif("+++TB_TX_UP" in shape.text):
+                    update_table_text(prs, slide, shape,slides.index(slide), replacements)
+
+                elif("+++TB_DRW" in shape.text):
+                    drow_tables(prs, slide, shape,slides.index(slide), replacements)
+
+                elif("+++INS" in shape.text):
+                    text_replace(slide, shape, replacements)
+
     remove_extra_slides(prs)
                     
 
     prs.save('output.pptx')
     end_time = time.perf_counter ()
     print(end_time - start_time, "seconds")
+
+    

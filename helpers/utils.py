@@ -23,7 +23,7 @@ def replace_tags(replaced_for,replaced_text, shape):
     if shape.has_table:
         for row in shape.table.rows:
             for cell in row.cells:
-                if match in cell.text:
+                if replaced_for in cell.text:
                     new_text = cell.text.replace(replaced_for, replaced_text)
                     cell.text = new_text
 
