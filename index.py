@@ -17,7 +17,7 @@ from expressions.if_condition import _if
 
 if __name__ == '__main__':
     start_time = time.perf_counter ()
-    prs = Presentation('input5.pptx')
+    prs = Presentation('task.pptx')
 
     replacements = {
         "schemeName": "XYZ Pension Scheme",
@@ -98,7 +98,7 @@ if __name__ == '__main__':
         "assetAllocation":{
             "styles" : {
                 "all":{
-                    "font_size": 7,
+                    "font_size": 8.5,
                     "font_name": "Arial",
                     "font_color": (163, 162, 162),
                 },

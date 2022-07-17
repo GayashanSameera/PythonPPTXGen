@@ -265,10 +265,14 @@ def execute_table_tags(shape , table, data, styles):
                         object_value = pydash.get(data, contidion)
                         text_result = ""
                         if(object_value):
+                            data_count = 1
                             for _data in object_value:
                                 updated_data = text_tag_update(matched_content[0],_data)
-                                if(updated_data and updated_data["text"]):
+                                if(updated_data and updated_data["text"] and len(object_value) > data_count):
                                     text_result += updated_data["text"] + "\n"
+                                elif(updated_data and updated_data["text"]):
+                                    text_result += updated_data["text"]
+                                data_count += 1
                         new_text = cell.text.replace(str(f"+++FOR {match} FOR-END+++"), text_result)
                         cell.text = new_text
                         try:
