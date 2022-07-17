@@ -95,6 +95,91 @@ if __name__ == '__main__':
                 ["Liability Benchmark","3.1%","-6.7%"],
             ]
         },
+        "assetAllocation":{
+            "styles" : {
+                "all":{
+                    "font_size": 8.5,
+                    "font_name": "Arial",
+                    "font_color": (110, 109, 109),
+                },
+                "cl_1": {
+                    "bold": True,
+                    "alignment": "middle",
+                }
+                "rw_1": {
+                    "column_indexes": (1,2),
+                    "font_color": (6, 123, 191),
+                },
+                "rw_2": {
+                    "column_indexes": (1,2),
+                    "font_color": (209, 189, 13),
+                },
+                "rw_3": {
+                    "column_indexes": (1,2),
+                    "font_color": (5, 125, 51),
+                },
+                "rw_4": {
+                    "column_indexes": (1,2),
+                    "font_color": (176, 19, 11),
+                }
+            },
+            "data": {
+                "item": "EQUITIES",
+                "eq_values": [
+                    { "label": "UK Equity", "march": "1.8%", "june": "1.8%" },
+                    { "label": "North America Equity", "march": "1.8%", "june": "1.9%" },
+                    { "label": "Europe (ex UK) Equity", "march": "3.0%", "june": "2.7%" },
+                    { "label": "Japan Equity", "march": "2.9%", "june": "2.8%" },
+                    { "label": "Asia Pacific ex-Japan Equity", "march": "1.7%", "june": "1.7%" },
+                    { "label": "Emerging Markets Equity", "march": "3.4%", "june": "3.6%" },
+                    { "label": "Global Developed Small Cap Equity", "march": "2.7%", "june": "2.7%" },
+                    { "label": "Smart beta equity", "march": "5.9%", "june": "5.6%" },
+                ],
+                "glb_bonds":"GLOBAL BONDS",
+                "glb_values": [
+                    { "label": "Fallen Angels’ Credit", "march": "5.1%", "june": "5.7%" },
+                    { "label": "UK Investment Grade Credit", "march": "3.1%", "june": "4.9%" },
+                    { "label": "Euro Investment Grade Credit", "march": "0.3%", "june": "0.7%" },
+                    { "label": "US Investment Grade Credit", "march": "2.2%", "june": "2.2%" },
+                    { "label": "Overseas Government Bonds", "march": "7.2%", "june": "5.5%" },
+                ],
+                "alternatives":"ALTERNATIVES",
+                "alt_values": [
+                    { "label": "Property", "march": "3.4%", "june": "3.4%" },
+                    { "label": "Listed Private Equity", "march": "1.8%", "june": "1.7%" },
+                    { "label": "High Yield Bonds", "march": "4.0%", "june": "3.9%" },
+                    { "label": "Listed Infrastructure", "march": "4.1%", "june": "3.6%" },
+                    { "label": "Global REITs", "march": "4.5%", "june": "4.4%" },
+                    { "label": "Emerging Market Bonds (Local)", "march": "4.1%", "june": "4.2%" },
+                    { "label": "Emerging Market Bonds (USD)", "march": "1.8%", "june": "1.9%" },
+                    { "label": "Commodities", "march": "1.4%", "june": "1.5%" },
+                ],
+                "alternatives":"ALTERNATIVES",
+                "alt_values": [
+                    { "label": "Property", "march": "3.4%", "june": "3.4%" },
+                    { "label": "Listed Private Equity", "march": "1.8%", "june": "1.7%" },
+                    { "label": "High Yield Bonds", "march": "4.0%", "june": "3.9%" },
+                    { "label": "Listed Infrastructure", "march": "4.1%", "june": "3.6%" },
+                    { "label": "Global REITs", "march": "4.5%", "june": "4.4%" },
+                    { "label": "Emerging Market Bonds (Local)", "march": "4.1%", "june": "4.2%" },
+                    { "label": "Emerging Market Bonds (USD)", "march": "1.8%", "june": "1.9%" },
+                    { "label": "Commodities", "march": "1.4%", "june": "1.5%" },
+                ],
+                "dynamic_str":"DYNAMIC  STRATEGIES",
+                "dyn_str_values": [
+                    { "label": "Multi-Asset Target Return (MATR)", "march": "16.5%", "june": "16.2%" },
+                ],
+                "lia_match":"LIABILITY-MATCHING",
+                "lia_values":[
+                    { "label": "Liability-matching credit", "march": "0.0%", "june": "0.0%" },
+                    { "label": "Liability driven investment strategies", "march": "17.4%", "june": "17.5%" },
+                ],
+                "ratios":[
+                    { "label": "Interest rate hedge ratio*", "march": "74%", "june": "73%" },
+                    { "label": "Inflation hedge ratio*", "march": "74%", "june": "73%" },
+                ]
+            }
+        },
         "position": "SSE",
         "city": "NW",
         "image_title": "This is a sample image",
