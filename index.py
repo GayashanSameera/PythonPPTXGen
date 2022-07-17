@@ -17,12 +17,12 @@ from expressions.if_condition import _if
 
 if __name__ == '__main__':
     start_time = time.perf_counter ()
-    prs = Presentation('input3.pptx')
+    prs = Presentation('input5.pptx')
 
     replacements = {
         "schemeName": "XYZ Pension Scheme",
         "title": "Q2 2021 Summary Report",
-        "heading":"Investment performance to 30 June 2021",
+        "heading_assets":"Investment performance to 30 June 2021",
         "assetAllocation": "Asset allocation at 30 June 2021",
         "assetChart": { "url" : "img1.png" , "size": {"left":1,"top":1, "height":3, "width":4}},
         "overallPerformance": "Overall performance",
@@ -98,33 +98,33 @@ if __name__ == '__main__':
         "assetAllocation":{
             "styles" : {
                 "all":{
-                    "font_size": 8.5,
+                    "font_size": 7,
                     "font_name": "Arial",
-                    "font_color": (110, 109, 109),
+                    "font_color": (163, 162, 162),
                 },
-                "cl_1": {
+                "cl_0": {
                     "bold": True,
                     "alignment": "middle",
-                }
+                },
                 "rw_1": {
-                    "column_indexes": (1,2),
+                    "column_indexes": [0, 1],
                     "font_color": (6, 123, 191),
                 },
                 "rw_2": {
-                    "column_indexes": (1,2),
+                    "column_indexes": [0,1],
                     "font_color": (209, 189, 13),
                 },
                 "rw_3": {
-                    "column_indexes": (1,2),
+                    "column_indexes": [0,1],
                     "font_color": (5, 125, 51),
                 },
                 "rw_4": {
-                    "column_indexes": (1,2),
+                    "column_indexes": [0,1],
                     "font_color": (176, 19, 11),
                 }
             },
             "data": {
-                "item": "EQUITIES",
+                "eq": "EQUITIES",
                 "eq_values": [
                     { "label": "UK Equity", "march": "1.8%", "june": "1.8%" },
                     { "label": "North America Equity", "march": "1.8%", "june": "1.9%" },
@@ -154,17 +154,7 @@ if __name__ == '__main__':
                     { "label": "Emerging Market Bonds (USD)", "march": "1.8%", "june": "1.9%" },
                     { "label": "Commodities", "march": "1.4%", "june": "1.5%" },
                 ],
-                "alternatives":"ALTERNATIVES",
-                "alt_values": [
-                    { "label": "Property", "march": "3.4%", "june": "3.4%" },
-                    { "label": "Listed Private Equity", "march": "1.8%", "june": "1.7%" },
-                    { "label": "High Yield Bonds", "march": "4.0%", "june": "3.9%" },
-                    { "label": "Listed Infrastructure", "march": "4.1%", "june": "3.6%" },
-                    { "label": "Global REITs", "march": "4.5%", "june": "4.4%" },
-                    { "label": "Emerging Market Bonds (Local)", "march": "4.1%", "june": "4.2%" },
-                    { "label": "Emerging Market Bonds (USD)", "march": "1.8%", "june": "1.9%" },
-                    { "label": "Commodities", "march": "1.4%", "june": "1.5%" },
-                ],
+                
                 "dynamic_str":"DYNAMIC  STRATEGIES",
                 "dyn_str_values": [
                     { "label": "Multi-Asset Target Return (MATR)", "march": "16.5%", "june": "16.2%" },

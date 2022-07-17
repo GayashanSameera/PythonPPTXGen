@@ -11,6 +11,7 @@ from copy import deepcopy
 from pptx.table import Table, _Row, _Column, _Cell
 from pptx.enum.text import PP_ALIGN
 
+from helpers.texts import text_tag_update
 from helpers.utils import check_tag_exist, replace_tags, get_tag_content, get_tag_from_string, eval_executor, is_extra_slide
 
 def replace_tables(presentation, slide, shape, slide_index, replacements):
@@ -245,30 +246,48 @@ def update_table_text(presentation, slide, shape, slide_index, replacements):
 
         replace_tags(str(f"+++TB_TX_UP {match} +++"), "", shape)
 
+
 def execute_table_tags(shape , table, data, styles):
     row_index = 0
     for row in table.rows:
+        col_index = 0
         for cell in row.cells:
-            pattern = r'\+\+\+INS (.*?) \+\+\+'
-            matches = get_tag_from_string(pattern, cell.text)
-            if( matches and len(matches) > 0):
-                for match in matches:
+            pattern_for = r'\+\+\+FOR (.*?) FOR-END\+\+\+'
+            matches_for = get_tag_from_string(pattern_for, cell.text)
+            if( matches_for and len(matches_for) > 0):
+                for match in matches_for:
+                    pattern_condition = r'\(\((.*?)\)\)'
+                    matched_condition = get_tag_from_string(pattern_condition,match)
+
+                    pattern_content = r'\<\<(.*?)\>\>'
+                    matched_content = get_tag_from_string(pattern_content,match)
+                    for contidion in matched_condition:
+                        object_value = pydash.get(data, contidion)
+                        text_result = ""
+                        if(object_value):
+                            for _data in object_value:
+                                updated_data = text_tag_update(matched_content[0],_data)
+                                if(updated_data and updated_data["text"]):
+                                    text_result += updated_data["text"] + "\n"
+                        new_text = cell.text.replace(str(f"+++FOR {match} FOR-END+++"), text_result)
+                        cell.text = new_text
+                        try:
+                            table_styles(cell,row_index,col_index,styles)
+                        except ValueError:
+                            print("error")
+                
+
+            pattern_text = r'\+\+\+INS (.*?) \+\+\+'
+            matches_text_update = get_tag_from_string(pattern_text, cell.text)
+            if( matches_text_update and len(matches_text_update) > 0):
+                for match in matches_text_update:
                     new_text = cell.text.replace(str(f"+++INS {match} +++"), pydash.get(data, match))
                     cell.text = new_text
                     try:
-                        row_st_index = str(f'rw_{row_index}')
-                        if(styles and row_st_index in styles):
-                            style_values = styles[row_st_index]
-                            para = cell.text_frame.paragraphs[0]
-                            para.font.size = Pt(style_values['font_size'])
-                            para.font.name = style_values['font_name']
-                            
-                            if style_values["alignment"] == "center":
-                                para.alignment = PP_ALIGN.CENTER
-                            if("font_color" in style_values):
-                                para.font.color.rgb = RGBColor(style_values["font_color"][0], style_values["font_color"][1],style_values["font_color"][2])
+                        table_styles(cell,row_index,col_index,styles)
                     except ValueError:
-                        print("error") 
+                        print("error")
+            col_index += 1 
         row_index +=1     
 
 
@@ -309,44 +328,78 @@ def drow_tables(presentation, slide, shape, slide_index, replacements):
 
 
 def execute_table_drower(table, data,styles):
-    print("data",data)
     row_data = data["rows"]
     row_index = 1
     for row in row_data:
-        print("row",row)
         colum_index = 0
         if row_index > 1:
             add_new_row_to_existing_table(table)
         for column in row:
             cell = table.cell(row_index, colum_index)
             cell.text = column
+            
+            try:
+                table_styles(cell,row_index,colum_index,styles)
+            except ValueError:
+                print("error")
+
             colum_index += 1
-            row_st_index = str(f'rw_{row_index}')
-            if(styles and (row_st_index in styles or 'all' in styles)):
-                para = cell.text_frame.paragraphs[0]
-                if('all' in styles):
-                    common_styles = styles['all']
+        row_index += 1
 
-                    if('font_size' in common_styles):
-                        para.font.size = Pt(common_styles['font_size'])
-                    if('font_name' in common_styles):
-                        para.font.name = common_styles['font_name']
-                    if('bold' in common_styles):
-                        para.font.bold = common_styles['bold']
-                    if('italic' in common_styles):
-                        para.font.italic = common_styles['italic']
-                    if('italic' in common_styles):
-                        para.font.italic = common_styles['italic']
-                    if("alignment" in common_styles):
-                        if common_styles["alignment"] == "center":
-                            para.alignment = PP_ALIGN.CENTER
-                    if("background_color" in common_styles):
-                        cell.fill.solid()
-                        cell.fill.fore_color.rgb = RGBColor(common_styles["background_color"][0], common_styles["background_color"][1],common_styles["background_color"][2])
+def add_new_row_to_existing_table(table):
+    new_row = deepcopy(table._tbl.tr_lst[1])
+    for tc in new_row.tc_lst:
+        cell = _Cell(tc, new_row.tc_lst)
+        cell.text = '' # defaulting cell contents to empty text
 
-                if(row_st_index in styles):
-                    _styles = styles[row_st_index]
+        table._tbl.append(new_row) 
+        return table.rows[1]
 
+def table_styles(cell,row_index,col_index,styles  ):
+    try:
+        row_st_index = str(f'rw_{row_index}')
+        col_st_index = str(f'cl_{col_index}')
+        para_index = 0
+        for paragraph in cell.text_frame.paragraphs:
+            para = cell.text_frame.paragraphs[para_index]
+            if(styles and 'all' in styles):
+                common_styles = styles['all']
+
+                if('font_size' in common_styles):
+                    para.font.size = Pt(common_styles['font_size'])
+                if('font_name' in common_styles):
+                    para.font.name = common_styles['font_name']
+                if('bold' in common_styles):
+                    para.font.bold = common_styles['bold']
+                if('italic' in common_styles):
+                    para.font.italic = common_styles['italic']
+                if("font_color" in common_styles):
+                    para.font.color.rgb = RGBColor(common_styles["font_color"][0], common_styles["font_color"][1],common_styles["font_color"][2])
+                if("alignment" in common_styles):
+                    if common_styles["alignment"] == "center":
+                        para.alignment = PP_ALIGN.CENTER
+                if("background_color" in common_styles):
+                    cell.fill.solid()
+                    cell.fill.fore_color.rgb = RGBColor(common_styles["background_color"][0], common_styles["background_color"][1],common_styles["background_color"][2])
+
+            if(styles and row_st_index in styles):
+                _styles = styles[row_st_index]
+                if( "column_indexes" in _styles):
+                    if(col_index in _styles["column_indexes"]):
+                        if('font_size' in _styles):
+                            para.font.size = Pt(_styles['font_size'])
+                        if('font_name' in _styles):
+                            para.font.name = _styles['font_name']
+                        if('bold' in _styles):
+                            para.font.bold = _styles['bold']
+                        if('italic' in _styles):
+                            para.font.italic = _styles['italic']
+                        if("font_color" in _styles):
+                            para.font.color.rgb = RGBColor(_styles["font_color"][0], _styles["font_color"][1],_styles["font_color"][2])
+                        if("background_color" in _styles):
+                            cell.fill.solid()
+                            cell.fill.fore_color.rgb = RGBColor(_styles["background_color"][0], _styles["background_color"][1],_styles["background_color"][2])
+                else:
                     if('font_size' in _styles):
                         para.font.size = Pt(_styles['font_size'])
                     if('font_name' in _styles):
@@ -361,15 +414,23 @@ def execute_table_drower(table, data,styles):
                         cell.fill.solid()
                         cell.fill.fore_color.rgb = RGBColor(_styles["background_color"][0], _styles["background_color"][1],_styles["background_color"][2])
 
-                
+            if(styles and col_st_index in styles):
+                col_styles = styles[col_st_index]
 
-        row_index += 1
-
-def add_new_row_to_existing_table(table):
-    new_row = deepcopy(table._tbl.tr_lst[1])
-    for tc in new_row.tc_lst:
-        cell = _Cell(tc, new_row.tc_lst)
-        cell.text = '' # defaulting cell contents to empty text
-
-        table._tbl.append(new_row) 
-        return table.rows[1]
+                if('font_size' in col_styles):
+                    para.font.size = Pt(col_styles['font_size'])
+                if('font_name' in col_styles):
+                    para.font.name = col_styles['font_name']
+                if('bold' in col_styles):
+                    para.font.bold = col_styles['bold']
+                if('italic' in col_styles):
+                    para.font.italic = col_styles['italic']
+                if("font_color" in col_styles):
+                    para.font.color.rgb = RGBColor(col_styles["font_color"][0], col_styles["font_color"][1],col_styles["font_color"][2])
+                if("background_color" in col_styles):
+                    cell.fill.solid()
+                    cell.fill.fore_color.rgb = RGBColor(col_styles["background_color"][0], col_styles["background_color"][1],col_styles["background_color"][2])
+    
+            para_index += 1
+    except ValueError:
+        print("error")
