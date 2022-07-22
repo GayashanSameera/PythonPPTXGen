@@ -17,14 +17,15 @@ from expressions.if_condition import _if
 
 if __name__ == '__main__':
     start_time = time.perf_counter ()
-    prs = Presentation('task.pptx')
+    prs = Presentation('input.pptx')
 
     replacements = {
         "schemeName": "XYZ Pension Scheme",
         "title": "Q2 2021 Summary Report",
+        "heading":"Investment performance to 30 June 2021",
         "heading_assets":"Investment performance to 30 June 2021",
         "assetAllocation": "Asset allocation at 30 June 2021",
-        "assetChart": { "url" : "img1.png" , "size": {"left":1,"top":1, "height":3, "width":4}},
+        "assetChart": { "url" : "img1.png" , "size": {"left":1,"top":1, "height":3, "width":4.2}},
         "overallPerformance": "Overall performance",
         "OPData":{
             "styles" : {
@@ -835,6 +836,8 @@ if __name__ == '__main__':
     for slide in slides:
         for shape in slide.shapes:
             if shape.has_text_frame:
+                # print("shape.text",shape.text)
+
                 if("+++IF" in shape.text):
                     _if(prs, slide, shape,slides.index(slide), replacements)
 

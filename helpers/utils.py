@@ -17,7 +17,9 @@ def replace_tags(replaced_for,replaced_text, shape):
         for paragraph in text_frame.paragraphs:
             for run in paragraph.runs:
                 cur_text = run.text
+                print("cur_text",cur_text)
                 new_text = cur_text.replace(replaced_for, replaced_text)
+                print("new_text",new_text)
                 run.text = new_text
 
     if shape.has_table:

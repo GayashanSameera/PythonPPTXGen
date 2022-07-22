@@ -17,7 +17,9 @@ def text_replace(slide, shape,replacements):
         return
 
     for match in matches:
+        print("match",match)
         object_value = pydash.get(replacements, match)
+        print("object_value",object_value)
         replace_tags(str(f"+++INS {match} +++"), str(object_value), shape)
 
 def text_tag_update(text,replacements):
