@@ -11,7 +11,7 @@
 #
 # Happy Coding!
 
-service: aws-python-docGen
+service: tpip-pptx-gen
 # app and org for use with dashboard.serverless.com
 #app: your-app-name
 #org: your-org-name
@@ -51,13 +51,13 @@ provider:
 #    - include-me-dir/**
 
 functions:
-  hello:
-    handler: src/handlers/handler.hello
+  generatePptx:
+    handler: route.docGen
     events:
       - http:
           cors: true 
           method: get
-          path: /doc-gen
+          path: /pptx-gen
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
