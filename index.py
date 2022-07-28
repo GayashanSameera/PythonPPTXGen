@@ -7,7 +7,7 @@ import math
 import re
 import pydash
 import time
-from helpers.utils import check_tag_exist, replace_tags, get_tag_content, remove_extra_slides
+from helpers.utils import check_tag_exist, replace_tags, get_tag_content, remove_extra_slides, drow_toc
 from helpers.texts import text_replace
 from helpers.images import replace_images
 from helpers.tables import replace_tables, update_table_text, drow_tables
@@ -17,7 +17,7 @@ from expressions.if_condition import _if
 
 if __name__ == '__main__':
     start_time = time.perf_counter ()
-    prs = Presentation('input.pptx')
+    prs = Presentation('demo.pptx')
 
     replacements = {
         "schemeName": "XYZ Pension Scheme",
@@ -171,6 +171,23 @@ if __name__ == '__main__':
                 ]
             }
         },
+        "toc":[
+            {
+                "id": "im1",
+                "text": "This is a sample image",
+                "sub":[{
+                    "id": "im2",
+                    "text": "sample image"
+                    }]
+                
+            },
+            {
+                "id": "im3",
+                "text": "Sample table to delete",
+            }
+        ],
+
+        
         "position": "SSE",
         "city": "NW",
         "image_title": "This is a sample image",
@@ -859,7 +876,8 @@ if __name__ == '__main__':
                 elif("+++INS" in shape.text):
                     text_replace(slide, shape, replacements)
 
-    remove_extra_slides(prs)
+    pres_final = remove_extra_slides(prs)
+    drow_toc(prs,replacements)
                     
 
     prs.save('output.pptx')
